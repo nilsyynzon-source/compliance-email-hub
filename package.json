@@ -1,0 +1,12 @@
+{
+  "name": "philly-compliance-email-hub",
+  "version": "1.0.0",
+  "description": "Philadelphia Property Management Compliance Email Generator",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.20.0"
+  }
+}

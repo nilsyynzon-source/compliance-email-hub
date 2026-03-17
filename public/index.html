@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compliance Email Hub — Philadelphia Property Management</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --surface2: #f0ede8;
+      --border: #e2ddd6;
+      --border2: #ccc8c0;
+      --text: #1a1916;
+      --text2: #6b6860;
+      --text3: #9e9b96;
+      --accent: #1d4ed8;
+      --accent-bg: #eff4ff;
+      --accent-border: #bfcfff;
+      --warn-bg: #fffbeb;
+      --warn-text: #92400e;
+      --warn-border: #fde68a;
+      --danger-bg: #fef2f2;
+      --danger-text: #991b1b;
+      --danger-border: #fecaca;
+      --success-bg: #f0fdf4;
+      --success-text: #166534;
+      --success-border: #bbf7d0;
+      --radius: 10px;
+      --radius-sm: 6px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo { font-size: 15px; font-weight: 600; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .header-sub { font-size: 12px; color: var(--text3); margin-left: 4px; }
+
+    .container { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+    .tab {
+      padding: 9px 18px; font-size: 13px; font-weight: 500; cursor: pointer;
+      border: none; background: none; color: var(--text2);
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color 0.15s;
+    }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-title { font-size: 13px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 14px; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; align-items: start; }
+    @media (max-width: 600px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    label { font-size: 12px; font-weight: 500; color: var(--text2); }
+
+    input[type="text"], textarea {
+      width: 100%; padding: 8px 11px; font-size: 13px;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: var(--surface); color: var(--text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      font-family: inherit;
+    }
+    input[type="text"]:focus, textarea:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
+    }
+    textarea { resize: vertical; min-height: 60px; }
+
+    .type-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 6px; }
+    @media (max-width: 580px) { .type-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .type-btn {
+      padding: 10px 8px; font-size: 12px; font-weight: 500; line-height: 1.4;
+      cursor: pointer; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: var(--surface2);
+      color: var(--text2); text-align: center; transition: all 0.15s;
+    }
+    .type-btn:hover { border-color: var(--border2); color: var(--text); }
+    .type-btn small { display: block; font-weight: 400; font-size: 11px; margin-top: 2px; color: var(--text3); }
+    .type-btn.active-initial { background: var(--accent-bg); border-color: var(--accent-border); color: var(--accent); }
+    .type-btn.active-initial small { color: var(--accent); opacity: 0.75; }
+    .type-btn.active-followup { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn-text); }
+    .type-btn.active-followup small { color: var(--warn-text); opacity: 0.75; }
+    .type-btn.active-final { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger-text); }
+    .type-btn.active-final small { color: var(--danger-text); opacity: 0.75; }
+    .type-btn.active-review { background: var(--success-bg); border-color: var(--success-border); color: var(--success-text); }
+    .type-btn.active-review small { color: var(--success-text); opacity: 0.75; }
+
+    .tone-hint { font-size: 12px; color: var(--text3); margin-top: 4px; min-height: 18px; }
+
+    .tag-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .tag {
+      font-size: 12px; padding: 4px 12px; border-radius: 20px;
+      border: 1px solid var(--border); cursor: pointer;
+      color: var(--text2); background: var(--surface);
+      user-select: none; transition: all 0.12s;
+    }
+    .tag:hover { border-color: var(--border2); color: var(--text); }
+    .tag.on { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-border); font-weight: 500; }
+
+    .expand-btn {
+      font-size: 12px; color: var(--accent); cursor: pointer;
+      background: none; border: none; padding: 2px 0; margin-bottom: 8px;
+    }
+    .more-tags { display: none; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+    .more-tags.open { display: flex; }
+
+    .gen-btn {
+      width: 100%; padding: 11px; font-size: 14px; font-weight: 600;
+      cursor: pointer; border-radius: var(--radius-sm);
+      background: var(--accent); color: white; border: none;
+      transition: opacity 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .gen-btn:hover { opacity: 0.92; }
+    .gen-btn:active { transform: scale(0.99); }
+    .gen-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .spinner {
+      display: inline-block; width: 13px; height: 13px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .output-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px;
+      margin-top: 16px; box-shadow: var(--shadow);
+    }
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .badge {
+      font-size: 11px; font-weight: 600; padding: 3px 10px;
+      border-radius: 20px; letter-spacing: 0.03em;
+    }
+    .badge.initial { background: var(--accent-bg); color: var(--accent); }
+    .badge.followup { background: var(--warn-bg); color: var(--warn-text); }
+    .badge.final { background: var(--danger-bg); color: var(--danger-text); }
+    .badge.review { background: var(--success-bg); color: var(--success-text); }
+
+    .btn-row { display: flex; gap: 8px; }
+    .sm-btn {
+      font-size: 12px; padding: 5px 14px; cursor: pointer;
+      border-radius: var(--radius-sm); border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text2);
+      font-weight: 500; transition: all 0.12s;
+    }
+    .sm-btn:hover { border-color: var(--border2); color: var(--text); }
+    .sm-btn.success { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+    .sm-btn.danger { color: var(--danger-text); border-color: var(--danger-border); background: none; }
+    .sm-btn.danger:hover { background: var(--danger-bg); }
+
+    .email-subject { font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 10px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
+    .email-body { font-size: 13px; white-space: pre-wrap; line-height: 1.75; color: var(--text); }
+
+    .error-box {
+      margin-top: 14px; background: var(--danger-bg); border: 1px solid var(--danger-border);
+      border-radius: var(--radius-sm); padding: 12px 14px;
+      font-size: 13px; color: var(--danger-text);
+    }
+
+    .note {
+      font-size: 12px; color: var(--text2); background: var(--surface2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      padding: 9px 13px; margin-bottom: 16px;
+    }
+
+    /* Batch */
+    .prop-entry { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px; background: var(--surface2); }
+    .prop-entry-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .prop-num { font-size: 12px; font-weight: 600; color: var(--text2); }
+    .add-prop-btn {
+      font-size: 13px; padding: 7px 16px; cursor: pointer;
+      border-radius: var(--radius-sm); border: 1px dashed var(--border2);
+      background: none; color: var(--accent); font-weight: 500;
+      transition: all 0.12s; width: 100%; margin-bottom: 16px;
+    }
+    .add-prop-btn:hover { background: var(--accent-bg); border-color: var(--accent-border); }
+
+    .prog-list { margin: 14px 0; }
+    .prog-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); margin-bottom: 6px;
+      background: var(--surface);
+    }
+    .prog-name { flex: 1; font-size: 13px; }
+    .prog-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border2); flex-shrink: 0; }
+    .prog-dot.running { background: var(--accent); animation: pulse 1s infinite; }
+    .prog-dot.done { background: #16a34a; }
+    .prog-dot.error { background: #dc2626; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+    .prog-label { font-size: 12px; color: var(--text3); }
+    .prog-label.running { color: var(--accent); }
+    .prog-label.done { color: #16a34a; }
+    .prog-label.error { color: #dc2626; }
+
+    .prop-output-header { font-size: 13px; font-weight: 600; color: var(--text2); margin: 18px 0 8px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+
+    /* History */
+    .hist-empty { text-align: center; color: var(--text3); padding: 40px 0; font-size: 13px; }
+    .hist-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      margin-bottom: 10px; box-shadow: var(--shadow);
+    }
+    .hist-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .hist-meta { font-size: 12px; color: var(--text3); margin-top: 4px; }
+    .hist-subj { font-size: 13px; font-weight: 600; margin: 5px 0 3px; }
+    .hist-preview { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%; }
+    .export-bar { display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 16px; }
+
+    .section-sep { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Compliance <span>Email Hub</span></div>
+  <div class="header-sub">Philadelphia Property Management</div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('single')">Single property</button>
+    <button class="tab" onclick="switchTab('batch')">Batch — multiple properties</button>
+    <button class="tab" onclick="switchTab('history')">Saved emails <span id="histCount"></span></button>
+  </div>
+
+  <!-- SINGLE -->
+  <div id="tab-single" class="panel active">
+    <div class="note">Always friendly and professional — tone only escalates when you choose a firmer email type below.</div>
+    <div class="card">
+      <div class="card-title">Property &amp; contact</div>
+      <div class="two-col">
+        <div class="field"><label>Owner / contact name *</label><input type="text" id="s-owner" placeholder="e.g. John Smith" /></div>
+        <div class="field"><label>Property address *</label><input type="text" id="s-address" placeholder="e.g. 1234 Market St, Philadelphia" /></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Your name / company</label><input type="text" id="s-sender" placeholder="e.g. Jane Doe, ABC Property Mgmt" /></div>
+        <div class="field"><label>Deadline (optional)</label><input type="text" id="s-deadline" placeholder="e.g. March 31, 2026" /></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Email type</div>
+      <div class="type-grid">
+        <button class="type-btn active-initial" id="st-initial" onclick="setSType('initial')">First reminder<small>Friendly nudge</small></button>
+        <button class="type-btn" id="st-followup" onclick="setSType('followup')">Follow-up<small>Firmer, deadline-focused</small></button>
+        <button class="type-btn" id="st-final" onclick="setSType('final')">Final notice<small>Serious, action required</small></button>
+        <button class="type-btn" id="st-review" onclick="setSType('review')">Review request<small>After compliance resolved</small></button>
+      </div>
+      <div class="tone-hint" id="s-toneHint">Warm and helpful. Sets a great first impression — good foundation for a future review ask.</div>
+    </div>
+
+    <div class="card" id="s-complianceCard">
+      <div class="card-title">Missing compliance items *</div>
+      <div class="tag-grid" id="s-tagGrid">
+        <span class="tag" data-val="Rental License">Rental License</span>
+        <span class="tag" data-val="Lead Disclosure Certificate">Lead Certificate</span>
+        <span class="tag" data-val="Certificate of Rental Suitability">Certificate of Rental Suitability</span>
+        <span class="tag" data-val="Fire Inspection Certificate">Fire Inspection Cert</span>
+        <span class="tag" data-val="CO Detector Compliance">CO Detector Compliance</span>
+        <span class="tag" data-val="Smoke Detector Compliance">Smoke Detector Compliance</span>
+        <span class="tag" data-val="Property Insurance Certificate">Insurance Certificate</span>
+        <span class="tag" data-val="W-9 Form">W-9 Form</span>
+      </div>
+      <button class="expand-btn" onclick="toggleMore('s')">+ More items</button>
+      <div class="more-tags" id="s-moreTags">
+        <span class="tag" data-val="Elevator Inspection Certificate">Elevator Inspection</span>
+        <span class="tag" data-val="Boiler Inspection Certificate">Boiler Inspection</span>
+        <span class="tag" data-val="Sprinkler System Inspection">Sprinkler Inspection</span>
+        <span class="tag" data-val="Plumbing Permit">Plumbing Permit</span>
+        <span class="tag" data-val="Electrical Permit">Electrical Permit</span>
+        <span class="tag" data-val="Building Permit">Building Permit</span>
+        <span class="tag" data-val="Zoning Approval">Zoning Approval</span>
+        <span class="tag" data-val="Asbestos Disclosure">Asbestos Disclosure</span>
+        <span class="tag" data-val="Flood Insurance Certificate">Flood Insurance</span>
+        <span class="tag" data-val="Landlord Identity Disclosure">Landlord Identity Disclosure</span>
+        <span class="tag" data-val="Habitability Inspection Report">Habitability Inspection</span>
+        <span class="tag" data-val="Mold Disclosure">Mold Disclosure</span>
+      </div>
+    </div>
+
+    <div class="card" id="s-reviewCard" style="display:none;">
+      <div class="card-title">Review details</div>
+      <div class="two-col">
+        <div class="field"><label>Review platform (optional)</label><input type="text" id="s-platform" placeholder="e.g. Google, Zillow, Apartments.com" /></div>
+        <div class="field"><label>Direct review link (optional)</label><input type="text" id="s-link" placeholder="e.g. https://g.page/r/..." /></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Additional notes</div>
+      <div class="field"><textarea id="s-notes" placeholder="e.g. longtime owner, previously submitted but expired, tenant move-in pending…"></textarea></div>
+    </div>
+
+    <button class="gen-btn" id="s-genBtn" onclick="generateSingle()">Generate email</button>
+    <div id="s-output"></div>
+  </div>
+
+  <!-- BATCH -->
+  <div id="tab-batch" class="panel">
+    <div class="note">Add multiple properties below. Shared settings (email type, compliance items, deadline) apply to all. Each property gets a fully personalized email.</div>
+
+    <div class="card">
+      <div class="card-title">Properties</div>
+      <div id="propList"></div>
+      <button class="add-prop-btn" onclick="addProp()">+ Add another property</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Shared settings — applied to all properties</div>
+      <div class="two-col">
+        <div class="field"><label>Your name / company</label><input type="text" id="b-sender" placeholder="e.g. Jane Doe, ABC Property Mgmt" /></div>
+        <div class="field"><label>Deadline (optional)</label><input type="text" id="b-deadline" placeholder="e.g. March 31, 2026" /></div>
+      </div>
+      <div class="field" style="margin-bottom:0;">
+        <label style="margin-bottom:8px;display:block;">Email type</label>
+        <div class="type-grid">
+          <button class="type-btn active-initial" id="bt-initial" onclick="setBType('initial')">First reminder<small>Friendly nudge</small></button>
+          <button class="type-btn" id="bt-followup" onclick="setBType('followup')">Follow-up<small>Firmer, deadline</small></button>
+          <button class="type-btn" id="bt-final" onclick="setBType('final')">Final notice<small>Serious, urgent</small></button>
+          <button class="type-btn" id="bt-review" onclick="setBType('review')">Review request<small>After resolved</small></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="b-complianceCard">
+      <div class="card-title">Missing compliance items (applied to all) *</div>
+      <div class="tag-grid" id="b-tagGrid">
+        <span class="tag" data-val="Rental License">Rental License</span>
+        <span class="tag" data-val="Lead Disclosure Certificate">Lead Certificate</span>
+        <span class="tag" data-val="Certificate of Rental Suitability">Certificate of Rental Suitability</span>
+        <span class="tag" data-val="Fire Inspection Certificate">Fire Inspection Cert</span>
+        <span class="tag" data-val="CO Detector Compliance">CO Detector Compliance</span>
+        <span class="tag" data-val="Smoke Detector Compliance">Smoke Detector Compliance</span>
+        <span class="tag" data-val="Property Insurance Certificate">Insurance Certificate</span>
+        <span class="tag" data-val="W-9 Form">W-9 Form</span>
+      </div>
+      <button class="expand-btn" onclick="toggleMore('b')">+ More items</button>
+      <div class="more-tags" id="b-moreTags">
+        <span class="tag" data-val="Elevator Inspection Certificate">Elevator Inspection</span>
+        <span class="tag" data-val="Boiler Inspection Certificate">Boiler Inspection</span>
+        <span class="tag" data-val="Sprinkler System Inspection">Sprinkler Inspection</span>
+        <span class="tag" data-val="Plumbing Permit">Plumbing Permit</span>
+        <span class="tag" data-val="Electrical Permit">Electrical Permit</span>
+        <span class="tag" data-val="Building Permit">Building Permit</span>
+        <span class="tag" data-val="Zoning Approval">Zoning Approval</span>
+        <span class="tag" data-val="Asbestos Disclosure">Asbestos Disclosure</span>
+        <span class="tag" data-val="Flood Insurance Certificate">Flood Insurance</span>
+        <span class="tag" data-val="Landlord Identity Disclosure">Landlord Identity Disclosure</span>
+        <span class="tag" data-val="Habitability Inspection Report">Habitability Inspection</span>
+        <span class="tag" data-val="Mold Disclosure">Mold Disclosure</span>
+      </div>
+    </div>
+
+    <div class="card" id="b-reviewCard" style="display:none;">
+      <div class="card-title">Review details</div>
+      <div class="two-col">
+        <div class="field"><label>Review platform</label><input type="text" id="b-platform" placeholder="e.g. Google, Zillow" /></div>
+        <div class="field"><label>Direct review link</label><input type="text" id="b-link" placeholder="e.g. https://g.page/r/..." /></div>
+      </div>
+    </div>
+
+    <button class="gen-btn" id="b-genBtn" onclick="generateBatch()">Generate all emails</button>
+    <div id="b-progress"></div>
+    <div id="b-output"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="tab-history" class="panel">
+    <div class="export-bar">
+      <button class="sm-btn" onclick="exportAll()">Export all as .txt</button>
+      <button class="sm-btn danger" onclick="clearAll()">Clear all</button>
+    </div>
+    <div id="histList"></div>
+  </div>
+</div>
+
+<script>
+  let sType = 'initial', bType = 'initial';
+  let history = JSON.parse(localStorage.getItem('emailHistory') || '[]');
+  let propCount = 0;
+  let sMoreOpen = false, bMoreOpen = false;
+
+  const labelMap = { initial: 'Initial reminder', followup: 'Follow-up', final: 'Final notice', review: 'Review request' };
+  const toneHints = {
+    initial: 'Warm and helpful. Sets a great first impression — good foundation for a future review ask.',
+    followup: 'Professional and direct. References prior outreach, deadline is front and center.',
+    final: 'Firm and serious. States Philadelphia compliance consequences clearly. Respectful throughout.',
+    review: 'Grateful and personal. Acknowledges resolved compliance and invites an honest review.'
+  };
+  const typeClasses = { initial: 'active-initial', followup: 'active-followup', final: 'active-final', review: 'active-review' };
+
+  function saveHistory() {
+    localStorage.setItem('emailHistory', JSON.stringify(history));
+    document.getElementById('histCount').textContent = history.length ? `(${history.length})` : '';
+  }
+
+  function switchTab(t) {
+    ['single','batch','history'].forEach(id => {
+      document.getElementById('tab-' + id).classList.toggle('active', id === t);
+    });
+    document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('active', ['single','batch','history'][i] === t));
+    if (t === 'history') renderHistory();
+  }
+
+  function setSType(t) {
+    sType = t;
+    ['initial','followup','final','review'].forEach(l => {
+      document.getElementById('st-' + l).className = 'type-btn' + (l === t ? ' ' + typeClasses[l] : '');
+    });
+    document.getElementById('s-toneHint').textContent = toneHints[t];
+    document.getElementById('s-complianceCard').style.display = t === 'review' ? 'none' : 'block';
+    document.getElementById('s-reviewCard').style.display = t === 'review' ? 'block' : 'none';
+  }
+
+  function setBType(t) {
+    bType = t;
+    ['initial','followup','final','review'].forEach(l => {
+      document.getElementById('bt-' + l).className = 'type-btn' + (l === t ? ' ' + typeClasses[l] : '');
+    });
+    document.getElementById('b-complianceCard').style.display = t === 'review' ? 'none' : 'block';
+    document.getElementById('b-reviewCard').style.display = t === 'review' ? 'block' : 'none';
+  }
+
+  function toggleMore(prefix) {
+    const open = prefix === 's' ? sMoreOpen : bMoreOpen;
+    const newOpen = !open;
+    if (prefix === 's') sMoreOpen = newOpen; else bMoreOpen = newOpen;
+    const el = document.getElementById(prefix + '-moreTags');
+    el.className = 'more-tags' + (newOpen ? ' open' : '');
+    el.previousElementSibling.textContent = newOpen ? '− Less items' : '+ More items';
+    if (newOpen) {
+      el.querySelectorAll('.tag').forEach(t => {
+        if (!t.dataset.bound) { t.addEventListener('click', () => t.classList.toggle('on')); t.dataset.bound = 1; }
+      });
+    }
+  }
+
+  document.querySelectorAll('#s-tagGrid .tag, #b-tagGrid .tag').forEach(t => t.addEventListener('click', () => t.classList.toggle('on')));
+
+  function getItems(prefix) {
+    return [...document.querySelectorAll('#' + prefix + '-tagGrid .tag.on, #' + prefix + '-moreTags .tag.on')].map(t => t.dataset.val);
+  }
+
+  function addProp() {
+    propCount++;
+    const id = propCount;
+    const div = document.createElement('div');
+    div.id = 'prop-' + id;
+    div.className = 'prop-entry';
+    div.innerHTML = `
+      <div class="prop-entry-header">
+        <span class="prop-num">Property ${id}</span>
+        <button class="sm-btn danger" onclick="removeProp(${id})">Remove</button>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Owner / contact name *</label><input type="text" id="p${id}-owner" placeholder="e.g. John Smith" /></div>
+        <div class="field"><label>Property address *</label><input type="text" id="p${id}-address" placeholder="e.g. 1234 Market St" /></div>
+      </div>
+      <div class="field" style="margin-bottom:0;"><label>Notes for this property (optional)</label><input type="text" id="p${id}-notes" placeholder="e.g. 2nd reminder, expired license, longtime owner" /></div>
+    `;
+    document.getElementById('propList').appendChild(div);
+  }
+
+  function removeProp(id) {
+    const el = document.getElementById('prop-' + id);
+    if (el) el.remove();
+  }
+
+  function getProps() {
+    const props = [];
+    for (let i = 1; i <= propCount; i++) {
+      const ownerEl = document.getElementById('p' + i + '-owner');
+      if (!ownerEl) continue;
+      const owner = ownerEl.value.trim();
+      const address = (document.getElementById('p' + i + '-address') || {}).value?.trim() || '';
+      const notes = (document.getElementById('p' + i + '-notes') || {}).value?.trim() || '';
+      if (owner || address) props.push({ id: i, owner, address, notes });
+    }
+    return props;
+  }
+
+  async function callAPI(payload) {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Unknown error');
+    return data;
+  }
+
+  async function generateSingle() {
+    const owner = document.getElementById('s-owner').value.trim();
+    const address = document.getElementById('s-address').value.trim();
+    const sender = document.getElementById('s-sender').value.trim();
+    const deadline = document.getElementById('s-deadline').value.trim();
+    const notes = document.getElementById('s-notes').value.trim();
+    const items = getItems('s');
+    const platform = document.getElementById('s-platform').value.trim();
+    const link = document.getElementById('s-link').value.trim();
+    const out = document.getElementById('s-output');
+
+    if (!owner || !address) { out.innerHTML = '<div class="error-box">Please enter owner name and property address.</div>'; return; }
+    if (sType !== 'review' && items.length === 0) { out.innerHTML = '<div class="error-box">Please select at least one compliance item.</div>'; return; }
+
+    const btn = document.getElementById('s-genBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Generating...';
+    out.innerHTML = '';
+
+    try {
+      const parsed = await callAPI({ owner, address, sender, deadline, items, emailType: sType, notes, platform, link });
+      const entry = { id: Date.now(), type: sType, subject: parsed.subject, body: parsed.body, owner, address, date: new Date().toLocaleDateString() };
+      out.appendChild(buildEmailCard(entry, true));
+    } catch(e) {
+      out.innerHTML = `<div class="error-box"><strong>Error:</strong> ${escH(e.message)}</div>`;
+    }
+    btn.disabled = false; btn.innerHTML = 'Generate email';
+  }
+
+  async function generateBatch() {
+    const props = getProps();
+    if (props.length === 0) { alert('Please add at least one property.'); return; }
+    const sender = document.getElementById('b-sender').value.trim();
+    const deadline = document.getElementById('b-deadline').value.trim();
+    const items = getItems('b');
+    const platform = document.getElementById('b-platform').value.trim();
+    const link = document.getElementById('b-link').value.trim();
+    if (bType !== 'review' && items.length === 0) { alert('Please select at least one compliance item.'); return; }
+
+    const btn = document.getElementById('b-genBtn');
+    btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Generating...';
+
+    const progDiv = document.getElementById('b-progress');
+    progDiv.innerHTML = `<div style="font-size:13px;color:var(--text2);margin:14px 0 8px;">${props.length} propert${props.length === 1 ? 'y' : 'ies'} queued</div>` +
+      `<div class="prog-list">` + props.map(p => `
+        <div class="prog-row" id="prog-${p.id}">
+          <div class="prog-dot" id="progdot-${p.id}"></div>
+          <div class="prog-name">${escH(p.owner || '—')} &middot; ${escH(p.address || '—')}</div>
+          <div class="prog-label pending" id="progst-${p.id}">Pending</div>
+        </div>`).join('') + `</div>`;
+
+    document.getElementById('b-output').innerHTML = '';
+    const results = [];
+
+    for (const p of props) {
+      document.getElementById('progdot-' + p.id).className = 'prog-dot running';
+      document.getElementById('progst-' + p.id).className = 'prog-label running';
+      document.getElementById('progst-' + p.id).textContent = 'Generating…';
+      try {
+        const parsed = await callAPI({ owner: p.owner, address: p.address, sender, deadline, items, emailType: bType, notes: p.notes, platform, link });
+        const entry = { id: Date.now() + p.id, type: bType, subject: parsed.subject, body: parsed.body, owner: p.owner, address: p.address, date: new Date().toLocaleDateString() };
+        results.push(entry);
+        document.getElementById('progdot-' + p.id).className = 'prog-dot done';
+        document.getElementById('progst-' + p.id).className = 'prog-label done';
+        document.getElementById('progst-' + p.id).textContent = 'Done';
+      } catch(e) {
+        document.getElementById('progdot-' + p.id).className = 'prog-dot error';
+        document.getElementById('progst-' + p.id).className = 'prog-label error';
+        document.getElementById('progst-' + p.id).textContent = 'Error';
+      }
+    }
+
+    const outDiv = document.getElementById('b-output');
+    outDiv.innerHTML = '';
+    if (results.length) {
+      const saveAllBtn = document.createElement('button');
+      saveAllBtn.className = 'sm-btn'; saveAllBtn.style.cssText = 'display:block;margin:16px 0 8px;';
+      saveAllBtn.textContent = `Save all ${results.length} to history`;
+      saveAllBtn.onclick = () => {
+        results.forEach(e => { if (!history.find(x => x.id === e.id)) history.unshift(e); });
+        saveHistory();
+        saveAllBtn.textContent = `All ${results.length} saved!`;
+        saveAllBtn.className = 'sm-btn success';
+      };
+      outDiv.appendChild(saveAllBtn);
+      results.forEach(entry => {
+        const h = document.createElement('div');
+        h.className = 'prop-output-header';
+        h.textContent = `${entry.owner} · ${entry.address}`;
+        outDiv.appendChild(h);
+        outDiv.appendChild(buildEmailCard(entry, false));
+      });
+    }
+    btn.disabled = false; btn.innerHTML = 'Generate all emails';
+  }
+
+  function buildEmailCard(entry, showSave) {
+    const card = document.createElement('div');
+    card.className = 'output-card';
+    const saveId = 'save-' + entry.id;
+    card.innerHTML = `
+      <div class="output-header">
+        <span class="badge ${entry.type}">${labelMap[entry.type]}</span>
+        <div class="btn-row">
+          ${showSave ? `<button class="sm-btn" id="${saveId}" onclick="saveOne(${entry.id}, '${saveId}', this)">Save</button>` : ''}
+          <button class="sm-btn" onclick="copyEmail(this, \`${esc(entry.subject)}\`, \`${esc(entry.body)}\`)">Copy</button>
+        </div>
+      </div>
+      <div class="email-subject">Subject: ${escH(entry.subject)}</div>
+      <hr class="divider"/>
+      <div class="email-body">${escH(entry.body)}</div>
+    `;
+    card._entry = entry;
+    return card;
+  }
+
+  function saveOne(id, btnId, btn) {
+    const card = btn.closest('.output-card');
+    if (!card || !card._entry) return;
+    if (!history.find(e => e.id === card._entry.id)) { history.unshift(card._entry); saveHistory(); }
+    btn.textContent = 'Saved!'; btn.className = 'sm-btn success';
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('histList');
+    if (!history.length) { list.innerHTML = '<div class="hist-empty">No saved emails yet. Generate and save emails from the other tabs.</div>'; return; }
+    list.innerHTML = history.map(e => `
+      <div class="hist-card">
+        <div class="hist-top">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="badge ${e.type}">${labelMap[e.type]}</span>
+              <span class="hist-meta">${e.date}</span>
+            </div>
+            <div class="hist-meta">${escH(e.owner)} · ${escH(e.address)}</div>
+            <div class="hist-subj">${escH(e.subject)}</div>
+            <div class="hist-preview">${escH(e.body.slice(0,130))}…</div>
+          </div>
+          <div class="btn-row">
+            <button class="sm-btn" onclick="copyHistEmail(this, ${e.id})">Copy</button>
+            <button class="sm-btn danger" onclick="deleteEmail(${e.id})">Delete</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function copyHistEmail(btn, id) {
+    const e = history.find(x => x.id === id);
+    if (!e) return;
+    navigator.clipboard.writeText(`Subject: ${e.subject}\n\n${e.body}`).then(() => {
+      btn.textContent = 'Copied!'; btn.className = 'sm-btn success';
+      setTimeout(() => { btn.textContent = 'Copy'; btn.className = 'sm-btn'; }, 2000);
+    });
+  }
+
+  function deleteEmail(id) {
+    history = history.filter(e => e.id !== id);
+    saveHistory(); renderHistory();
+  }
+
+  function clearAll() {
+    if (!confirm('Clear all saved emails?')) return;
+    history = []; saveHistory(); renderHistory();
+  }
+
+  function exportAll() {
+    if (!history.length) { alert('No saved emails to export.'); return; }
+    const text = history.map(e => `=== ${labelMap[e.type]} | ${e.owner} | ${e.address} | ${e.date} ===\nSubject: ${e.subject}\n\n${e.body}\n\n`).join('---\n\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
+    a.download = 'compliance_emails.txt'; a.click();
+  }
+
+  function copyEmail(btn, subject, body) {
+    navigator.clipboard.writeText(`Subject: ${subject}\n\n${body}`).then(() => {
+      btn.textContent = 'Copied!'; btn.className = 'sm-btn success';
+      setTimeout(() => { btn.textContent = 'Copy'; btn.className = 'sm-btn'; }, 2000);
+    });
+  }
+
+  function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function esc(s) { return (s||'').replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$'); }
+
+  // Init
+  updateHistCount();
+  function updateHistCount() {
+    document.getElementById('histCount').textContent = history.length ? `(${history.length})` : '';
+  }
+  addProp(); addProp();
+</script>
+</body>
+</html>
