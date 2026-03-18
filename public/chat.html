@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compliance Assistant — Philadelphia Property Management</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f7f6f3;
+      --surface: #ffffff;
+      --surface2: #f0ede8;
+      --border: #e2ddd6;
+      --border2: #ccc8c0;
+      --text: #1a1916;
+      --text2: #6b6860;
+      --text3: #9e9b96;
+      --accent: #1d4ed8;
+      --accent-bg: #eff4ff;
+      --accent-border: #bfcfff;
+      --accent-dark: #1638a0;
+      --success-bg: #f0fdf4;
+      --success-text: #166534;
+      --success-border: #bbf7d0;
+      --warn-bg: #fffbeb;
+      --warn-text: #92400e;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      font-size: 13px; color: var(--accent); text-decoration: none;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .back-btn:hover { text-decoration: underline; }
+    .logo { font-size: 15px; font-weight: 600; }
+    .logo span { color: var(--accent); }
+    .clear-btn {
+      font-size: 12px; padding: 5px 12px; cursor: pointer;
+      border: 1px solid var(--border); border-radius: var(--radius-sm);
+      background: none; color: var(--text2);
+    }
+    .clear-btn:hover { background: var(--surface2); }
+
+    .chat-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 780px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+      overflow: hidden;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .msg { display: flex; gap: 10px; align-items: flex-start; }
+    .msg.user { flex-direction: row-reverse; }
+
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; flex-shrink: 0;
+    }
+    .avatar.assistant { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-border); }
+    .avatar.user { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+
+    .bubble {
+      max-width: 75%;
+      padding: 11px 14px;
+      border-radius: var(--radius);
+      line-height: 1.65;
+      font-size: 13.5px;
+    }
+    .msg.assistant .bubble {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top-left-radius: 4px;
+      box-shadow: var(--shadow);
+    }
+    .msg.user .bubble {
+      background: var(--accent);
+      color: white;
+      border-top-right-radius: 4px;
+    }
+
+    .bubble-actions {
+      display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap;
+    }
+    .action-btn {
+      font-size: 11px; padding: 3px 10px; cursor: pointer;
+      border-radius: 20px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text2);
+      transition: all 0.12s;
+    }
+    .action-btn:hover { border-color: var(--border2); color: var(--text); }
+    .action-btn.copied { background: var(--success-bg); color: var(--success-text); border-color: var(--success-border); }
+
+    .chip-row {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 10px;
+    }
+    .chip {
+      font-size: 12px; padding: 5px 12px; cursor: pointer;
+      border-radius: 20px; border: 1px solid var(--accent-border);
+      background: var(--accent-bg); color: var(--accent);
+      transition: all 0.12s;
+    }
+    .chip:hover { background: var(--accent); color: white; }
+
+    .typing {
+      display: flex; align-items: center; gap: 4px;
+      padding: 11px 14px;
+    }
+    .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--text3); animation: bounce 1.2s infinite;
+    }
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,60%,100% { transform: translateY(0); } 30% { transform: translateY(-5px); } }
+
+    .input-area {
+      padding: 12px 0 20px;
+      flex-shrink: 0;
+    }
+    .input-row {
+      display: flex; gap: 8px; align-items: flex-end;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 8px;
+      box-shadow: var(--shadow);
+      transition: border-color 0.15s;
+    }
+    .input-row:focus-within { border-color: var(--accent); }
+    textarea#userInput {
+      flex: 1; border: none; outline: none; resize: none;
+      font-size: 13.5px; font-family: inherit; line-height: 1.5;
+      background: transparent; color: var(--text);
+      min-height: 40px; max-height: 140px;
+    }
+    textarea#userInput::placeholder { color: var(--text3); }
+    .send-btn {
+      width: 36px; height: 36px; border-radius: var(--radius-sm);
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: background 0.15s;
+    }
+    .send-btn:hover { background: var(--accent-dark); }
+    .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .send-btn svg { width: 16px; height: 16px; fill: white; }
+
+    .welcome {
+      text-align: center; padding: 32px 16px 16px;
+      color: var(--text2);
+    }
+    .welcome h2 { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .welcome p { font-size: 13px; line-height: 1.6; max-width: 480px; margin: 0 auto 20px; }
+
+    .pre-wrap { white-space: pre-wrap; }
+
+    .mode-badge {
+      display: inline-block; font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 20px; margin-bottom: 6px;
+      background: var(--warn-bg); color: var(--warn-text);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <a href="/" class="back-btn">← Email Hub</a>
+    <div class="logo">Compliance <span>Assistant</span></div>
+  </div>
+  <button class="clear-btn" onclick="clearChat()">Clear chat</button>
+</header>
+
+<div class="chat-wrap">
+  <div class="messages" id="messages">
+    <div class="welcome">
+      <h2>Philadelphia Compliance Assistant</h2>
+      <p>I can help you draft email and SMS replies, suggest how to obtain compliance documents, and guide you through any compliance situation. Just describe what's happening or paste in a message you received.</p>
+      <div class="chip-row" style="justify-content:center;">
+        <span class="chip" onclick="quickSend('An owner replied asking what a rental license is and how to get one. Help me respond.')">Owner asking about rental license</span>
+        <span class="chip" onclick="quickSend('Draft an SMS follow-up for an owner who hasn\'t responded to my email about their missing lead certificate.')">SMS follow-up for no response</span>
+        <span class="chip" onclick="quickSend('An owner says they already submitted their Certificate of Rental Suitability but I have no record of it. Help me reply professionally.')">Owner claims they already submitted</span>
+        <span class="chip" onclick="quickSend('How does an owner obtain a Philadelphia Rental License? What are the steps and fees?')">How to get a rental license</span>
+        <span class="chip" onclick="quickSend('Owner is frustrated about compliance requirements. Help me de-escalate and explain why these are important.')">Frustrated owner</span>
+        <span class="chip" onclick="quickSend('Draft a short friendly SMS reminder for an owner whose rental license expires in 2 weeks.')">License expiring soon SMS</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-row">
+      <textarea id="userInput" placeholder="Describe the situation or paste a message you received..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SYSTEM_PROMPT = `You are a Philadelphia property management compliance assistant. You help property managers draft professional email and SMS replies to property owners, explain how to obtain compliance documents, and navigate compliance situations.
+
+Your expertise includes:
+- Philadelphia Rental License (required for all rental properties, obtained via philadelphia.gov, ~$55/unit/year)
+- Lead Disclosure Certificate / Lead Paint Clearance (required for pre-1978 properties with children under 6, obtain via certified inspector)
+- Certificate of Rental Suitability (obtained after L&I inspection, ensures property meets habitability standards)
+- Fire Inspection Certificate (Philadelphia Fire Department, required for multi-unit properties)
+- CO and Smoke Detector Compliance (PA state law, landlord must install and maintain)
+- Property Insurance Certificate (proof of landlord insurance)
+- W-9 Form (IRS form for tax reporting)
+- Other Philadelphia L&I permits and certificates
+
+Tone guidelines:
+- Always friendly, warm, and professional
+- Firm when needed (follow-ups, final notices) but never rude
+- Relationship-preserving — these owners may leave reviews later
+- Philadelphia-specific and accurate
+
+When drafting messages:
+- For EMAIL: provide a subject line and full email body
+- For SMS: keep it under 160 characters if possible, casual but professional
+- Always ask if they want email or SMS format if unclear
+- Offer to adjust tone (friendlier, firmer, shorter, etc.)
+- After drafting, offer follow-up options like "want a firmer version?" or "need an SMS version too?"
+
+When explaining how to obtain documents:
+- Give specific Philadelphia steps, websites, phone numbers, and typical costs
+- Mention typical processing times
+- Suggest what to tell the owner to make it easy for them
+
+Format your responses cleanly. Use line breaks between sections. When providing a draft message, clearly label it as DRAFT EMAIL or DRAFT SMS and set it apart so it's easy to copy.`;
+
+let conversationHistory = [];
+let isTyping = false;
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function quickSend(text) {
+  document.getElementById('userInput').value = text;
+  sendMessage();
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text || isTyping) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Remove welcome screen
+  const welcome = document.querySelector('.welcome');
+  if (welcome) welcome.remove();
+
+  appendMessage('user', text);
+  conversationHistory.push({ role: 'user', content: text });
+
+  showTyping();
+  isTyping = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  try {
+    const apiKey = await getApiKey();
+    if (!apiKey) {
+      hideTyping();
+      appendAssistantMessage("I couldn't connect to the AI service. Please make sure your OpenAI API key is set up correctly in Vercel.", []);
+      isTyping = false;
+      document.getElementById('sendBtn').disabled = false;
+      return;
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        max_tokens: 1200,
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...conversationHistory
+        ]
+      })
+    });
+
+    const data = await response.json();
+    hideTyping();
+
+    if (!response.ok) {
+      appendAssistantMessage(`Error: ${data.error?.message || 'Something went wrong. Please try again.'}`, []);
+    } else {
+      const reply = data.choices[0].message.content;
+      conversationHistory.push({ role: 'assistant', content: reply });
+      const actions = getActions(reply);
+      appendAssistantMessage(reply, actions);
+    }
+  } catch(e) {
+    hideTyping();
+    appendAssistantMessage(`Connection error: ${e.message}`, []);
+  }
+
+  isTyping = false;
+  document.getElementById('sendBtn').disabled = false;
+}
+
+async function getApiKey() {
+  try {
+    const resp = await fetch('/api/key');
+    if (resp.ok) {
+      const data = await resp.json();
+      return data.key;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function getActions(text) {
+  const actions = [];
+  const lower = text.toLowerCase();
+  actions.push({ label: 'Copy response', fn: () => copyText(text) });
+  if (lower.includes('draft email') || lower.includes('subject:')) {
+    actions.push({ label: 'Copy email only', fn: () => copyEmailOnly(text) });
+  }
+  if (lower.includes('draft sms') || lower.includes('sms:') || lower.includes('text message')) {
+    actions.push({ label: 'Copy SMS only', fn: () => copySMSOnly(text) });
+  }
+  actions.push({ label: 'Make it firmer', fn: () => quickSend('Make that message firmer and more urgent.') });
+  actions.push({ label: 'Make it friendlier', fn: () => quickSend('Make that message warmer and more friendly.') });
+  if (!lower.includes('sms')) {
+    actions.push({ label: 'SMS version', fn: () => quickSend('Now give me a short SMS version of that.') });
+  }
+  return actions;
+}
+
+function appendMessage(role, text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const initial = role === 'user' ? 'You' : 'AI';
+  div.innerHTML = `
+    <div class="avatar ${role}">${initial}</div>
+    <div class="bubble pre-wrap">${escH(text)}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendAssistantMessage(text, actions) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+
+  const actionsHtml = actions.length ? `
+    <div class="bubble-actions">
+      ${actions.map((a, i) => `<button class="action-btn" id="act-${Date.now()}-${i}" onclick="(${a.fn.toString()})()">${a.label}</button>`).join('')}
+    </div>` : '';
+
+  div.innerHTML = `
+    <div class="avatar assistant">AI</div>
+    <div>
+      <div class="bubble pre-wrap">${formatResponse(text)}</div>
+      ${actionsHtml}
+    </div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function formatResponse(text) {
+  return escH(text)
+    .replace(/DRAFT EMAIL:/g, '<strong>DRAFT EMAIL:</strong>')
+    .replace(/DRAFT SMS:/g, '<strong>DRAFT SMS:</strong>')
+    .replace(/Subject:/g, '<strong>Subject:</strong>');
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="avatar assistant">AI</div>
+    <div class="bubble typing"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).then(() => showCopied());
+}
+
+function copyEmailOnly(text) {
+  const match = text.match(/Subject:[\s\S]+/i);
+  navigator.clipboard.writeText(match ? match[0].trim() : text).then(() => showCopied());
+}
+
+function copySMSOnly(text) {
+  const match = text.match(/(?:DRAFT SMS:|SMS:|Text message:)([\s\S]+?)(?:\n\n|$)/i);
+  navigator.clipboard.writeText(match ? match[1].trim() : text).then(() => showCopied());
+}
+
+function showCopied() {
+  const btn = event?.target;
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+  }
+}
+
+function clearChat() {
+  conversationHistory = [];
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = `
+    <div class="welcome">
+      <h2>Philadelphia Compliance Assistant</h2>
+      <p>I can help you draft email and SMS replies, suggest how to obtain compliance documents, and guide you through any compliance situation.</p>
+      <div class="chip-row" style="justify-content:center;">
+        <span class="chip" onclick="quickSend('An owner replied asking what a rental license is and how to get one. Help me respond.')">Owner asking about rental license</span>
+        <span class="chip" onclick="quickSend('Draft an SMS follow-up for an owner who hasn\'t responded to my email about their missing lead certificate.')">SMS follow-up for no response</span>
+        <span class="chip" onclick="quickSend('An owner says they already submitted their Certificate of Rental Suitability but I have no record of it. Help me reply professionally.')">Owner claims they already submitted</span>
+        <span class="chip" onclick="quickSend('How does an owner obtain a Philadelphia Rental License? What are the steps and fees?')">How to get a rental license</span>
+        <span class="chip" onclick="quickSend('Owner is frustrated about compliance requirements. Help me de-escalate and explain why these are important.')">Frustrated owner</span>
+        <span class="chip" onclick="quickSend('Draft a short friendly SMS reminder for an owner whose rental license expires in 2 weeks.')">License expiring soon SMS</span>
+      </div>
+    </div>`;
+}
+
+function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
