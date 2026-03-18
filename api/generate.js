@@ -5,9 +5,9 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ error: "ANTHROPIC_API_KEY is not set in environment variables." });
+    return res.status(500).json({ error: "OPENAI_API_KEY is not set in environment variables." });
   }
 
   const { owner, address, sender, deadline, items, emailType, notes, platform, link } = req.body;
@@ -44,17 +44,19 @@ Return ONLY raw JSON, no markdown fences: {"subject":"...","body":"..."}
 Rules: Philadelphia-specific context. No unfilled placeholders. Sign off with sender. Use \\n\\n between paragraphs. Prose only, no bullet points.`;
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01"
+        "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
+        model: "gpt-4o-mini",
         max_tokens: 1000,
-        messages: [{ role: "user", content: prompt }]
+        messages: [
+          { role: "system", content: "You are a professional property manager assistant. Always respond with raw JSON only, no markdown." },
+          { role: "user", content: prompt }
+        ]
       })
     });
 
@@ -64,7 +66,7 @@ Rules: Philadelphia-specific context. No unfilled placeholders. Sign off with se
       return res.status(response.status).json({ error: data.error?.message || JSON.stringify(data) });
     }
 
-    const raw = data.content.map(b => b.text || "").join("");
+    const raw = data.choices[0].message.content;
     const clean = raw.replace(/```json|```/g, "").trim();
     const parsed = JSON.parse(clean);
     return res.status(200).json(parsed);
